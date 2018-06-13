@@ -51,15 +51,15 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     require(!data.viewEvents.take(1).isEmpty,
       s"viewEvents in PreparedData cannot be empty." +
       " Please check if DataSource generates TrainingData" +
-      " and Preprator generates PreparedData correctly.")
+      " and Preprator generates PreparedData correctly(this is a view events error check).")
     require(!data.users.take(1).isEmpty,
       s"users in PreparedData cannot be empty." +
       " Please check if DataSource generates TrainingData" +
-      " and Preprator generates PreparedData correctly.")
+      " and Preprator generates PreparedData correctly.(this is user event error")
     require(!data.items.take(1).isEmpty,
       s"items in PreparedData cannot be empty." +
       " Please check if DataSource generates TrainingData" +
-      " and Preprator generates PreparedData correctly.")
+      " and Preprator generates PreparedData correctly.(this is item event error")
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
