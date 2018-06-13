@@ -64,7 +64,7 @@ class DataSource(val dsp: DataSourceParams)
     val viewEventsRDD: RDD[ViewEvent] = PEventStore.find(
       appName = dsp.appName,
       entityType = Some("user"),
-      eventNames = Some(List("view")),
+      eventNames = Some(List("view","play")),
       // targetEntityType is optional field of an event.
       targetEntityType = Some(Some("item")))(sc)
       // eventsDb.find() returns RDD[Event]
