@@ -83,7 +83,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           logger.info(s"Couldn't convert nonexistent item ID ${r.item}"
             + " to Int index.")
 
-        ((uindex, iindex), 1)
+        ((uindex, iindex), a)
       }.filter { case ((u, i), v) =>
         // keep events with valid user and item index
         (u != -1) && (i != -1)
