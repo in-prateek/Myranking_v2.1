@@ -68,10 +68,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       .map { r =>
       
         // Convert user and item String IDs to Int index for MLlib
-        val v = r.v
-        val v = r.viewEvent
-        logger.info(s"r.v value ${r.v}" + " to Int index.")
-        logger.info(s"r.viewEvent value ${r.viewEvent}" + " to Int index.")
+        val a = r.v
+        val b = r.viewEvent
+        logger.info(s"r.v valuemm ${r.v}" )
+        logger.info(s"r.viewEvent valuemm ${r.viewEvent}")
         val uindex = userStringIntMap.getOrElse(r.user, -1)
         val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
@@ -85,11 +85,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             + " to Int index.")
 
         ((uindex, iindex), v)
-      }.filter { case ((u, i), v) =>
+      }.filter { case ((u, i), 1) =>
         // keep events with valid user and item index
         (u != -1) && (i != -1) && ((v == 1) || (v == 2))
       }.reduceByKey(_ + _) // aggregate all view events of same user-item pair
-      .map { case ((u, i), v) =>
+      .map { case ((u, i), 1) =>
         // MLlibRating requires integer index for user and item
         MLlibRating(u, i, v)
       }
