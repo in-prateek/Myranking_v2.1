@@ -4,7 +4,7 @@
   "engineFactory": "org.template.productranking.ProductRankingEngine",
   "datasource": {
     "params" : {
-      "appName": "papp"
+      "appName": "capp"
     }
   },
   "algorithms": [
