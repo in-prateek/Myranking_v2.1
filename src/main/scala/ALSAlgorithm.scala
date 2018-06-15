@@ -69,6 +69,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       
         // Convert user and item String IDs to Int index for MLlib
         val v = r.v
+        val v = r.viewEvent
+        logger.info(s"r.v value ${r.v}" + " to Int index.")
+        logger.info(s"r.viewEvent value ${r.viewEvent}" + " to Int index.")
         val uindex = userStringIntMap.getOrElse(r.user, -1)
         val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
