@@ -63,14 +63,13 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
-
+    logger.info(s"data.items.keys valuemm ${data.items.keys}")
+    logger.info(s"data.users.keys valuemm ${data.users.keys}")
     val mllibRatings = data.viewEvents
       .map { r =>
       
         // Convert user and item String IDs to Int index for MLlib
-        val a = r.v
-        val b = r.viewEvent
-        logger.info(s"r.v valuemm ${r.v}" )
+        val a = r.viewEvent
         logger.info(s"r.viewEvent valuemm ${r.viewEvent}")
         val uindex = userStringIntMap.getOrElse(r.user, -1)
         val iindex = itemStringIntMap.getOrElse(r.item, -1)
@@ -84,10 +83,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           logger.info(s"Couldn't convert nonexistent item ID ${r.item}"
             + " to Int index.")
 
-        ((uindex, iindex), v)
+        ((uindex, iindex), 1)
       }.filter { case ((u, i), 1) =>
         // keep events with valid user and item index
-        (u != -1) && (i != -1) && ((v == 1) || (v == 2))
+        (u != -1) && (i != -1)
       }.reduceByKey(_ + _) // aggregate all view events of same user-item pair
       .map { case ((u, i), 1) =>
         // MLlibRating requires integer index for user and item
