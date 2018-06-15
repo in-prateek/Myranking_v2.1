@@ -12,8 +12,8 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
-
-case class DataSourceParams(appName: String) extends Params
+// addtion here:
+case class DataSourceParams(appName: String/*, eventNames : List[String]*/) extends Params
 
 class DataSource(val dsp: DataSourceParams)
   extends PDataSource[TrainingData,
@@ -74,11 +74,13 @@ class DataSource(val dsp: DataSourceParams)
             case "view" => ViewEvent(
               user = event.entityId,
               item = event.targetEntityId.get,
-              t = event.eventTime.getMillis)
+              t = event.eventTime.getMillis,
+              v=1)
              case "play" => ViewEvent(
               user = event.entityId,
               item = event.targetEntityId.get,
-              t = event.eventTime.getMillis)
+              t = event.eventTime.getMillis,
+              v= 2)
             case _ => throw new Exception(s"Unexpected event ${event} is read.")
           }
         } catch {
@@ -103,7 +105,7 @@ case class User()
 
 case class Item()
 
-case class ViewEvent(user: String, item: String, t: Long)
+case class ViewEvent(user: String, item: String, t: Long, v: Int) // can we add a new arg here showing actionType
 
 class TrainingData(
   val users: RDD[(String, User)],
@@ -114,5 +116,6 @@ class TrainingData(
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
     s"items: [${items.count()} (${items.take(2).toList}...)]" +
     s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
-  }
+  
+}
 }
