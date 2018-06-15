@@ -69,8 +69,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       .map { r =>
       
         // Convert user and item String IDs to Int index for MLlib
-        val a = r.viewEvent
-        logger.info(s"r.viewEvent valuemm ${r.viewEvent}")
+        val a = r.v
+        logger.info(s"r.viewEvent valuemm ${r.v}")
         val uindex = userStringIntMap.getOrElse(r.user, -1)
         val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
@@ -159,8 +159,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
-          ItemScore(
+            val it = model.items(i)
+            ItemScore(
             item = iid,
+            Genre =  it.Genre,
+            Country = it.placeholder.Country,
+            Rating = it.placeholder.Rating,
             score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
