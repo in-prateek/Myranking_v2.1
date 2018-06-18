@@ -112,7 +112,7 @@ class DataSource(val dsp: DataSourceParams)
 
 case class User()
 
-case class Item(Genre:String,Country:String,Rating:String)
+case class Item(genre: String, country: String, rating: String)
 
 case class ViewEvent(user: String, item: String, t: Long, v: Int) // can we add a new arg here showing actionType
 
