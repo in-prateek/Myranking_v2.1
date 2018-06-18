@@ -167,7 +167,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             rating = it.rating,
             score = scoreOpt.getOrElse[Double](0)
           )
-            logger.info(s"it.Genre is ${it.Genre}.")
+            logger.info(s"it.Genre is ${it.genre}.")
         }.sorted(ord).toArray
 
         PredictedResult(
