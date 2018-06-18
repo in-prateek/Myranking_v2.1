@@ -57,7 +57,7 @@ class DataSource(val dsp: DataSourceParams)
         "Rating"  */
     logger.info(s"genre::${ properties.get[String]("Genre")} and country :: ${properties.get[String]("Country")}")
         Item( genre = properties.get[String]("Genre"),
-          country = properties.get[String]("Country "),// space to be removed
+          country = properties.get[String]("Country"),
           rating = properties.get[String]("Rating"))
        // logger.info(s"genre::${genre} and country :: ${country}")
       } catch {
