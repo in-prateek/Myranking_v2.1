@@ -24,8 +24,7 @@ class ALSModel(
   val userFeatures: Map[Int, Array[Double]],
   val productFeatures: Map[Int, Array[Double]],
   val userStringIntMap: BiMap[String, Int],
-  val itemStringIntMap: BiMap[String, Int],
-  val items: Map[Int, Item]
+  val itemStringIntMap: BiMap[String, Int]
 ) extends Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
@@ -39,9 +38,7 @@ class ALSModel(
     s" userStringIntMap: [${userStringIntMap.size}]" +
     s"(${userStringIntMap.take(2).toString}...)]" +
     s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]" +
-    s" items: [${items.size}]" +
-    s"(${items.take(2).toString}...)]"
+    s"(${itemStringIntMap.take(2).toString}...)]"
   }
 }
 
@@ -66,8 +63,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
-    val items: Map[Int, Item] = data.items.map { case (id, item) =>
-      (itemStringIntMap(id), item)
     }.collectAsMap.toMap
    // logger.info(s"data.items.keys valuemm ${data.items.keys}")
   //  logger.info(s"data.users.keys valuemm ${data.users.keys}")
@@ -121,8 +116,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       userFeatures = m.userFeatures.collectAsMap.toMap,
       productFeatures = m.productFeatures.collectAsMap.toMap,
       userStringIntMap = userStringIntMap,
-      itemStringIntMap = itemStringIntMap,
-      items = items
+      itemStringIntMap = itemStringIntMap
     )
   }
 
@@ -169,9 +163,20 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             val item = model.items.get(iid.toInt)
             ItemScore(
             item = iid,
-            genre =  iid.genre,//s"A",
-            country = iid.country,//s"I"
-            rating = iid.rating,//s"3"
+           
+            /*
+            genre =  iid.genre,
+            country = iid.country,
+            rating = iid.rating,
+            */
+            
+            //hardcoded values:
+            
+            genre = s"A",
+            country = s"I",
+            rating = s"3",
+
+
             score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
