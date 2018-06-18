@@ -39,7 +39,9 @@ class ALSModel(
     s" userStringIntMap: [${userStringIntMap.size}]" +
     s"(${userStringIntMap.take(2).toString}...)]" +
     s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]"
+    s"(${itemStringIntMap.take(2).toString}...)]" +
+    s" items: [${items.size}]" +
+    s"(${items.take(2).toString}...)]"
   }
 }
 
