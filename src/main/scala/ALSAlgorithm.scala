@@ -163,8 +163,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             ItemScore(
             item = iid,
             Genre =  it.Genre,
-            Country = it.placeholder.Country,
-            Rating = it.placeholder.Rating,
+            Country = it.Country,
+            Rating = it.Rating,
             score = scoreOpt.getOrElse[Double](0)
           )
             logger.info(s"it.Genre is ${it.Genre}.")
