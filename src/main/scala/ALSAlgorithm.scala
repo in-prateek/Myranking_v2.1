@@ -110,7 +110,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       blocks = -1,
       alpha = 1.0,
       seed = seed)
-logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
+//logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
     new ALSModel(
       rank = m.rank,
       userFeatures = m.userFeatures.collectAsMap.toMap,
@@ -118,7 +118,7 @@ logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMa
       userStringIntMap = userStringIntMap,
       itemStringIntMap = itemStringIntMap
     ) 
-    
+
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {
@@ -155,7 +155,7 @@ logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMa
         logger.info(s"No productFeature for all items ${query.items}.")
         PredictedResult(
           itemScores = notRankedItemScores,
-          isOriginal = true
+          isOriginal = true                       // while this is executed when data not found / not mapped properly:mm
         )
       } else {
         // sort the score
@@ -184,7 +184,7 @@ logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMa
 
         PredictedResult(
           itemScores = sorted,
-          isOriginal = false
+          isOriginal = false          // this is executed when data is found and mapped:mm
         )
       }
     }.getOrElse {
