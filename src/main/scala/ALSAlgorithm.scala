@@ -159,7 +159,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
-            val it = model.productFeatures(iid)
+            val it = model.productFeatures(iid.toInt)
             ItemScore(
             item = iid,
             Genre =  it.Genre,
