@@ -110,7 +110,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       blocks = -1,
       alpha = 1.0,
       seed = seed)
-
+logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
     new ALSModel(
       rank = m.rank,
       userFeatures = m.userFeatures.collectAsMap.toMap,
@@ -118,7 +118,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       userStringIntMap = userStringIntMap,
       itemStringIntMap = itemStringIntMap
     ) 
-    logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
+    
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {
