@@ -58,7 +58,7 @@ class DataSource(val dsp: DataSourceParams)
         Item( genre = properties.get[String]("Genre"),
           country = properties.get[String]("Country"),
           rating = properties.get[String]("Rating"))
-        logger.info(s"genre::${genre} and country :: ${country}")
+       // logger.info(s"genre::${genre} and country :: ${country}")
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +
