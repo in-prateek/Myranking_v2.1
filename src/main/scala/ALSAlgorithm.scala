@@ -24,7 +24,8 @@ class ALSModel(
   val userFeatures: Map[Int, Array[Double]],
   val productFeatures: Map[Int, Array[Double]],
   val userStringIntMap: BiMap[String, Int],
-  val itemStringIntMap: BiMap[String, Int]
+  val itemStringIntMap: BiMap[String, Int],
+  val items: Map[Int, Item]
 ) extends Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
