@@ -117,7 +117,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       productFeatures = m.productFeatures.collectAsMap.toMap,
       userStringIntMap = userStringIntMap,
       itemStringIntMap = itemStringIntMap
-    )
+    ) 
+    logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {
