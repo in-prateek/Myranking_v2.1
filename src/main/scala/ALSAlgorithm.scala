@@ -162,9 +162,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             val it = model.productFeatures(iid.toInt)
             ItemScore(
             item = iid,
-            Genre =  it.Genre,
-            Country = it.Country,
-            Rating = it.Rating,
+            genre =  it.genre,
+            country = it.country,
+            rating = it.rating,
             score = scoreOpt.getOrElse[Double](0)
           )
             logger.info(s"it.Genre is ${it.Genre}.")
