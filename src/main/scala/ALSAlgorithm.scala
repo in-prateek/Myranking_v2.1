@@ -126,7 +126,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     // default itemScores array if items are not ranked at all
     lazy val notRankedItemScores =
-      query.items.map(i => ItemScore(i,s"genre",s"india",s"2",0)).toArray
+      query.items.map(i => ItemScore(i,s"genre",s"india",2,0)).toArray
 
     model.userStringIntMap.get(query.user).map { userIndex =>
       // lookup userFeature for the user
@@ -159,7 +159,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
-            val it = model.items(i)
+            val it = model.item(i)
             ItemScore(
             item = iid,
             Genre =  it.Genre,
