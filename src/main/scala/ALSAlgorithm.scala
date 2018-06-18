@@ -169,9 +169,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             val item = model.items.get(iid.toInt)
             ItemScore(
             item = iid,
-            genre =  item.genre,
-            country = item.country,
-            rating = item.rating,
+            genre =  iid.genre,
+            country = iid.country,
+            rating = iid.rating,
             score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
