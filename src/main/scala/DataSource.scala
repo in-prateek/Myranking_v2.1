@@ -12,7 +12,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
-// addtion here:
+// addtion here:not commited??
 case class DataSourceParams(appName: String/*, eventNames : List[String]*/) extends Params
 
 class DataSource(val dsp: DataSourceParams)
@@ -52,7 +52,7 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val item = try {
         // placeholder for expanding item properties
-    /*  "Genre" 
+    /*  "Genre"
         "Country"
         "Rating"  */
         Item( Genre = properties.get[String]("Genre"),
@@ -111,7 +111,7 @@ class DataSource(val dsp: DataSourceParams)
 
 case class User()
 
-case class Item()
+case class Item(Genre:String,Country:String,Rating:String)
 
 case class ViewEvent(user: String, item: String, t: Long, v: Int) // can we add a new arg here showing actionType
 
