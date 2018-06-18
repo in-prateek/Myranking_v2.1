@@ -17,7 +17,7 @@ case class ItemScore(
   item: String,
   genre : String,
   country: String,
-  rating: Int,
+  rating: String,
   score: Double
 ) extends Serializable
 
