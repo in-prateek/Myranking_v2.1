@@ -52,16 +52,13 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val item = try {
         // placeholder for expanding item properties
-    /*  "Genre"
-        "Country"
-        "Rating"  */
-    logger.info(s"genre::${ properties.get[String]("Genre")} and country :: ${properties.get[String]("Country")}")
-        Item( genre = properties.get[String]("Genre"),
-          country = properties.get[String]("Country"),
-          rating = properties.get[String]("Rating"))
-       // logger.info(s"genre::${genre} and country :: ${country}")
+      logger.info(s"genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
+          Item(genre = properties.getOrElse[String]("Genre",s"Unk"),
+          country = properties.getOrElse[String]("Country",s"Unk"),
+          rating = properties.getOrElse[String]("Rating",s"0"))
       } catch {
         case e: Exception => {
+          genre=s"unk"
           logger.error(s"Failed to get properties ${properties} of" +
             s" item ${entityId}. Exception: ${e}.")
           throw e

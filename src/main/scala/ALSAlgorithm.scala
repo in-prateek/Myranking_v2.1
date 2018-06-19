@@ -115,6 +115,7 @@ logger.info(s"ALSalgorithm:114:::m.userFeatures.collectAsMap.toMap:::: ${m.userF
 logger.info(s"ALSalgorithm:115:::m.productFeatures.collectAsMap.toMap:::: ${m.productFeatures.collectAsMap.toMap}.")
 logger.info(s"ALSalgorithm:116:::userStringIntMap:::: ${userStringIntMap}.")
 logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
+  
     new ALSModel(
       rank = m.rank,
       userFeatures = m.userFeatures.collectAsMap.toMap,
@@ -122,14 +123,13 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       userStringIntMap = userStringIntMap,
       itemStringIntMap = itemStringIntMap
     ) 
-
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {
 
     val itemStringIntMap = model.itemStringIntMap
     val productFeatures = model.productFeatures
-
+logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
     // default itemScores array if items are not ranked at all
     lazy val notRankedItemScores =
       query.items.map(i => ItemScore(i,0)).toArray
@@ -164,10 +164,12 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       } else {
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
+logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
             ItemScore(
             item = iid,
             score = scoreOpt.getOrElse[Double](0)
+           
           )
         }.sorted(ord).toArray
 
@@ -191,9 +193,11 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val size = v1.size
     var i = 0
     var d: Double = 0
+    logger.info(s"193:ALS::dotProduct::v1: Array[Double], v2: Array[Double] ${v1}. ${v2}")
     while (i < size) {
       d += v1(i) * v2(i)
       i += 1
+    logger.info(s"200:ALS::d+  :  ${v1(i)} ** ${v2(i)}   ====   ${d}.")  
     }
     d
   }
