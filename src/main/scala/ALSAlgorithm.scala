@@ -110,7 +110,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       blocks = -1,
       alpha = 1.0,
       seed = seed)
-//logger.info(s"m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
+logger.info(s"ALSalgorithm:113:::m.rank:::: ${m.rank}.")
+logger.info(s"ALSalgorithm:114:::m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
+logger.info(s"ALSalgorithm:115:::m.productFeatures.collectAsMap.toMap:::: ${m.productFeatures.collectAsMap.toMap}.")
+logger.info(s"ALSalgorithm:116:::userStringIntMap:::: ${userStringIntMap}.")
+logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     new ALSModel(
       rank = m.rank,
       userFeatures = m.userFeatures.collectAsMap.toMap,
@@ -128,7 +132,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     // default itemScores array if items are not ranked at all
     lazy val notRankedItemScores =
-      query.items.map(i => ItemScore(i,s"UNKNOWN_genre",s"UNKNOWN_country",s"UNKNOWN_rating",0)).toArray
+      query.items.map(i => ItemScore(i,0)).toArray
 
     model.userStringIntMap.get(query.user).map { userIndex =>
       // lookup userFeature for the user
@@ -163,20 +167,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
             ItemScore(
             item = iid,
-           
-            /*
-            genre =  iid.genre,
-            country = iid.country,
-            rating = iid.rating,
-            */
-            
-            //hardcoded values:
-            
-            genre = s"A",
-            country = s"I",
-            rating = s"3",
-
-
             score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray

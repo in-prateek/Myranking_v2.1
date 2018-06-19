@@ -15,9 +15,6 @@ case class PredictedResult(
 
 case class ItemScore(
   item: String,
-  genre : String,
-  country: String,
-  rating: String,
   score: Double
 ) extends Serializable
 
