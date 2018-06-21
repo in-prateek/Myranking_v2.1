@@ -134,11 +134,12 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
 
     val itemStringIntMap = model.itemStringIntMap
     val productFeatures = model.productFeatures
-logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
-   // propertyReader()
+    logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
+
+    // propertyReader()
     // default itemScores array if items are not ranked at all
-    lazy val notRankedItemScores =
-      query.items.map(i => ItemScore(i,0)).toArray
+
+    lazy val notRankedItemScores = query.items.map(i => ItemScore(i,0)).toArray
 
     model.userStringIntMap.get(query.user).map { userIndex =>
       // lookup userFeature for the user
@@ -150,7 +151,7 @@ logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")
         .map { iid =>
           // convert query item id to index
           val featureOpt: Option[Array[Double]] = itemStringIntMap.get(iid)
-            // productFeatures may not contain the item
+          // productFeatures may not contain the item
             .map (index => productFeatures.get(index))
             // flatten Option[Option[Array[Double]]] to Option[Array[Double]]
             .flatten
@@ -160,7 +161,6 @@ logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")
 
       // check if all scores is None (get rid of all None and see if empty)
       val isAllNone = scores.flatten.isEmpty
-
       if (isAllNone) {
         logger.info(s"No productFeature for all items ${query.items}.")
         PredictedResult(
@@ -170,12 +170,11 @@ logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")
       } else {
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
-logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
+        logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
-            ItemScore(
+          ItemScore(
             item = iid,
             score = scoreOpt.getOrElse[Double](0)
-           
           )
         }.sorted(ord).toArray
 
@@ -191,7 +190,6 @@ logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
         isOriginal = true
       )
     }
-
   }
 
   private
@@ -208,28 +206,30 @@ logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
     d
   }
 
-def propertyReader(sc: SparkContext) : PropertyData = {
-//RDD if item-property
-val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
-      appName = dsp.appName,
+  def propertyReader() : Double = {
+    //RDD if item-property
+    var d: Double = 0
+    val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
+      appName = ap.appName,
       entityType = "item"
     )(sc).map { case (entityId, properties) =>
-  val property = try {
-     logger.info(s"PROPERTY_READER_LOGGER_::_genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
-    Property(genre = properties.getOrElse[String]("Genre",s"Unk"),
+      val property = try {
+        logger.info(s"PROPERTY_READER_LOGGER_::_genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
+        Property(
+          genre = properties.getOrElse[String]("Genre",s"Unk"),
           country = properties.getOrElse[String]("Country",s"Unk"),
           rating = properties.getOrElse[String]("Rating",s"0")
-  )
-}catch {
+        )
+      }catch {
         case e: Exception => {
           logger.error(s"PROPERTY_READER_::_Failed to get properties ${properties} of" +
             s" item ${entityId}. Exception: ${e}.")
           throw e
         }
       }
-(entityId, property)
-}.cache()
-}
+      d
+    }.cache()
+  }
 
 
 

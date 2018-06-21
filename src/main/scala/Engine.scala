@@ -2,6 +2,7 @@ package org.template.productranking
 
 import org.apache.predictionio.controller.IEngineFactory
 import org.apache.predictionio.controller.Engine
+import org.apache.spark.rdd.RDD
 
 case class Query(
   user: String,
@@ -28,7 +29,7 @@ object ProductRankingEngine extends IEngineFactory {
   }
 }
 
-case class Property(genre: String, country: String, rating: String)
+case class Property(genre: String, country: String, rating: String) extends Serializable
 
 class PropertyData(
 val ItemProperty: RDD[(String,Property)]
