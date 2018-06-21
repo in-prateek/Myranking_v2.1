@@ -30,7 +30,7 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val user = try {
         // placeholder for expanding user properties
-        User()
+          User()
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +

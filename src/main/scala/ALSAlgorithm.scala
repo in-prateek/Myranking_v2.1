@@ -18,12 +18,6 @@ import grizzled.slf4j.Logger
 
 import scala.collection.parallel.immutable.ParVector
 
-case class DataSourceParams(appName: String) extends Params
-
-class DataSource(val dsp: DataSourceParams)
-  extends PDataSource[PropertyData,
-      EmptyEvaluationInfo, Query, EmptyActualResult] 
-
 case class ALSAlgorithmParams(
   rank: Int,
   numIterations: Int,
