@@ -63,9 +63,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
-    
-   // logger.info(s"data.items.keys valuemm ${data.items.keys}")
-  //  logger.info(s"data.users.keys valuemm ${data.users.keys}")
+
     val mllibRatings = data.viewEvents
       .map { r =>
       
