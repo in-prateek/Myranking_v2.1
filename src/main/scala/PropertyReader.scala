@@ -1,3 +1,6 @@
+import org.apache.predictionio.data.store.PEventStore
+
+class property(){
 def propertyReader() : PropertyData = {
 
 	//RDD if item-property
@@ -22,6 +25,7 @@ def propertyReader() : PropertyData = {
 (entityId, item)
 }.cache()
 
+}
 
 case class Property(genre: String, country: String, rating: String)
 
