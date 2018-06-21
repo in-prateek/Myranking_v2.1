@@ -9,6 +9,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.mllib.recommendation.ALS
 import org.apache.spark.mllib.recommendation.{Rating => MLlibRating}
 
+//additional imports:- 
 import org.apache.predictionio.data.store.PEventStore
 import org.apache.spark.rdd.RDD
 import org.apache.predictionio.data.storage.Event
@@ -22,7 +23,8 @@ case class ALSAlgorithmParams(
   rank: Int,
   numIterations: Int,
   lambda: Double,
-  seed: Option[Long]) extends Params
+  seed: Option[Long],
+  appName: String) extends Params
 
 class ALSModel(
   val rank: Int,
