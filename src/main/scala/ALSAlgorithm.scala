@@ -209,17 +209,24 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     d
   }
 
-  def propertyReader(sc: SparkContext) : Double = {
+  def propertyReader(sc: SparkContext) : RDD[String] = {
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
     logger.info(s"appName::${appName}")
-    val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
+    val prop = PEventStore.findByEntity(
+      appName=ap.appName,
+      entityType="item",
+      entityId = query.items.get,
+      event = "$set"
+      )
+
+    /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
       appName = ap.appName,
       entityType = "item"
       )(sc).map { case (entityId, properties) =>
       val property = try {
-        logger.info(s"PROPERTY_READER_LOGGER_::_genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
+        logger.info(s"ALS:PROPERTY_READER_::genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
         Property(
           genre = properties.getOrElse[String]("Genre",s"Unk"),
           country = properties.getOrElse[String]("Country",s"Unk"),
@@ -233,12 +240,18 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
         }
       }
       (entityId, property)
-    }.cache() 
-    d
+    }.cache()*/ 
+    prop
   }
 
-
-
-
-
 }
+
+
+
+/*
+   val bias : RDD[(String,Property)]= ItemProperty
+    .map{b=>
+      val pid: string = b.
+    }.filter {case (pid,Property(A,B,C) )=>
+      (A=="i1")
+    */
