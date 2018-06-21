@@ -68,6 +68,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       " Please check if DataSource generates TrainingData" +
       " and Preprator generates PreparedData correctly.(this is item event error")
     // create User and item's String ID to integer index BiMap
+    var pr = propertyReader(sc)
+    logger.info(s"propertyReader:: ${pr}")
+
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
 
@@ -209,7 +212,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
   def propertyReader(sc: SparkContext) : Double = {
     //RDD if item-property
     var d: Double = 0
-    appName = ap.appName
+    val appName = ap.appName
     logger.info(s"appName::${appName}")
     /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
       appName = ap.appName,
