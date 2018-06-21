@@ -1,18 +1,19 @@
-def propertyReader(sc: SparkContext, appname: String) : PropertyData = {
+def propertyReader() : PropertyData = {
 
 	//RDD if item-property
 	val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
-      appName = dsp.appName,
+      appName = "capp",
       entityType = "item"
   		)(sc).map { case (entityId, properties) =>
   val property = try {
-  	property(genre = properties.getOrElse[String]("Genre",s"Unk"),
+  	 logger.info(s"PROPERTY_READER_LOGGER_::_genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
+    Property(genre = properties.getOrElse[String]("Genre",s"Unk"),
           country = properties.getOrElse[String]("Country",s"Unk"),
           rating = properties.getOrElse[String]("Rating",s"0")
   	)
 }catch {
         case e: Exception => {
-          logger.error(s"Failed to get properties ${properties} of" +
+          logger.error(s"PROPERTY_READER_::_Failed to get properties ${properties} of" +
             s" item ${entityId}. Exception: ${e}.")
           throw e
         }
@@ -20,3 +21,6 @@ def propertyReader(sc: SparkContext, appname: String) : PropertyData = {
 }
 (entityId, item)
 }.cache()
+
+
+case class Property(genre: String, country: String, rating: String)
