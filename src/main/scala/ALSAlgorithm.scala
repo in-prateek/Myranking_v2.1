@@ -214,7 +214,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     var d: Double = 0
     val appName = ap.appName
     logger.info(s"appName::${appName}")
-    /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
+    val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
       appName = ap.appName,
       entityType = "item"
       )(sc).map { case (entityId, properties) =>
@@ -233,7 +233,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
         }
       }
       (entityId, property)
-    }.cache()*/ 
+    }.cache() 
     d
   }
 
