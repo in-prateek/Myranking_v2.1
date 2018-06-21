@@ -128,7 +128,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val itemStringIntMap = model.itemStringIntMap
     val productFeatures = model.productFeatures
 logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
-    propertyReader()
+   // propertyReader()
     // default itemScores array if items are not ranked at all
     lazy val notRankedItemScores =
       query.items.map(i => ItemScore(i,0)).toArray

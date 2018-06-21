@@ -2,21 +2,16 @@ import org.apache.predictionio.data.store.PEventStore
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.predictionio.controller.Params
+import org.apache.spark.rdd.RDD
 
 import org.apache.predictionio.controller.PDataSource
-import org.apache.predictionio.controller.EmptyEvaluationInfo
-import org.apache.predictionio.controller.EmptyActualResult
 import org.apache.predictionio.data.storage.Event
-
 
 import grizzled.slf4j.Logger
 
 case class DataSourceParams(appName: String) extends Params
-class property(val dsp: DataSourceParams)
- extends PDataSource[TrainingData,
-      EmptyEvaluationInfo, Query, EmptyActualResult]{
-
-  @transient lazy val logger = Logger[this.type]
+class property(val dsp: DataSourceParams){
+@transient lazy val logger = Logger[this.type]
 def propertyReader(sc: SparkContext) : PropertyData = {
 
 	//RDD if item-property
