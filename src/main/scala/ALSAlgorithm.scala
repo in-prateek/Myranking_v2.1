@@ -9,6 +9,9 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.mllib.recommendation.ALS
 import org.apache.spark.mllib.recommendation.{Rating => MLlibRating}
 
+import org.apache.predictionio.data.store.PEventStore
+import org.apache.spark.rdd.RDD
+
 import grizzled.slf4j.Logger
 
 import scala.collection.parallel.immutable.ParVector
@@ -200,5 +203,32 @@ logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
     }
     d
   }
+
+def propertyReader(sc: SparkContext) : PropertyData = {
+//RDD if item-property
+val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
+      appName = dsp.appName,
+      entityType = "item"
+    )(sc).map { case (entityId, properties) =>
+  val property = try {
+     logger.info(s"PROPERTY_READER_LOGGER_::_genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
+    Property(genre = properties.getOrElse[String]("Genre",s"Unk"),
+          country = properties.getOrElse[String]("Country",s"Unk"),
+          rating = properties.getOrElse[String]("Rating",s"0")
+  )
+}catch {
+        case e: Exception => {
+          logger.error(s"PROPERTY_READER_::_Failed to get properties ${properties} of" +
+            s" item ${entityId}. Exception: ${e}.")
+          throw e
+        }
+      }
+(entityId, property)
+}.cache()
+}
+
+
+
+
 
 }

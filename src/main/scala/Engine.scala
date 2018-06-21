@@ -27,3 +27,9 @@ object ProductRankingEngine extends IEngineFactory {
       classOf[Serving])
   }
 }
+
+case class Property(genre: String, country: String, rating: String)
+
+class PropertyData(
+val ItemProperty: RDD[(String,Property)]
+)
