@@ -13,7 +13,7 @@ import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
 // addtion here:not commited??
-case class DataSourceParams(appName: String/*, eventNames : List[String]*/) extends Params
+case class DataSourceParams(appName: String) extends Params
 
 class DataSource(val dsp: DataSourceParams)
   extends PDataSource[TrainingData,
