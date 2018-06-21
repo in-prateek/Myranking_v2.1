@@ -58,7 +58,6 @@ class DataSource(val dsp: DataSourceParams)
           rating = properties.getOrElse[String]("Rating",s"0"))
       } catch {
         case e: Exception => {
-          genre=s"unk"
           logger.error(s"Failed to get properties ${properties} of" +
             s" item ${entityId}. Exception: ${e}.")
           throw e

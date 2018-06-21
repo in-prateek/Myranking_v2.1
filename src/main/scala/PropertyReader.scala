@@ -1,11 +1,13 @@
 import org.apache.predictionio.data.store.PEventStore
-
-class property(){
-def propertyReader() : PropertyData = {
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+case class DataSourceParams(appName: String) extends Params
+class property(val dsp: DataSourceParams){
+def propertyReader(sc: SparkContext) : PropertyData = {
 
 	//RDD if item-property
 	val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
-      appName = "capp",
+      appName = dsp.appName,
       entityType = "item"
   		)(sc).map { case (entityId, properties) =>
   val property = try {
