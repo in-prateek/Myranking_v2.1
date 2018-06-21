@@ -42,10 +42,9 @@ class DataSource(val dsp: DataSourceParams)
           throw e
         }
       }
-    }
-    (entityId, user)
+      (entityId, user)
     }.cache()
-}
+
     // create a RDD of (entityID, Item)
     val itemsRDD: RDD[(String, Item)] = PEventStore.aggregateProperties(
       appName = dsp.appName,
