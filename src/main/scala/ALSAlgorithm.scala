@@ -11,10 +11,18 @@ import org.apache.spark.mllib.recommendation.{Rating => MLlibRating}
 
 import org.apache.predictionio.data.store.PEventStore
 import org.apache.spark.rdd.RDD
+import org.apache.predictionio.data.storage.Event
+import org.apache.predictionio.controller.PDataSource
 
 import grizzled.slf4j.Logger
 
 import scala.collection.parallel.immutable.ParVector
+
+case class DataSourceParams(appName: String) extends Params
+
+class DataSource(val dsp: DataSourceParams)
+  extends PDataSource[PropertyData,
+      EmptyEvaluationInfo, Query, EmptyActualResult] 
 
 case class ALSAlgorithmParams(
   rank: Int,

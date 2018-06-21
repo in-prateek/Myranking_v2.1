@@ -30,9 +30,6 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val user = try {
         // placeholder for expanding user properties
-      /*"Country" 
-        "Gender"*/
-
         User()
       } catch {
         case e: Exception => {
