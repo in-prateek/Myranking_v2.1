@@ -32,10 +32,9 @@ def propertyReader(sc: SparkContext) : PropertyData = {
           throw e
         }
       }
-}
-(entityId, item)
+(entityId, property)
 }.cache()
-
+}
 }
 
 case class Property(genre: String, country: String, rating: String)
