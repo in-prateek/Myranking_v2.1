@@ -119,7 +119,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       blocks = -1,
       alpha = 1.0,
       seed = seed)
-logger.info(s"AL5Salgorithm:113:::m.rank:::: ${m.rank}.")
+logger.info(s"ALSalgorithm:113:::m.rank:::: ${m.rank}.")
 logger.info(s"ALSalgorithm:114:::m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
 logger.info(s"ALSalgorithm:115:::m.productFeatures.collectAsMap.toMap:::: ${m.productFeatures.collectAsMap.toMap}.")
 logger.info(s"ALSalgorithm:116:::userStringIntMap:::: ${userStringIntMap}.")
@@ -140,7 +140,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val productFeatures = model.productFeatures
     logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
 
-    var pr = propertyReader(query)
+    var pr = query.items.foreach(propertyReader(_,query))
     logger.info(s"propertyReader:: ${pr}") 
     while (pr.hasNext) 
     println(pr.next())
@@ -215,7 +215,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     d
   }
 
-  def propertyReader(/*sc: SparkContext,*/ query: Query) : Iterator[Event] = {
+  def propertyReader(ip: String ,query: Query) : Iterator[Event] = {
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
@@ -223,7 +223,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val prop = LEventStore.findByEntity(
       appName=appName,
       entityType="item",
-      entityId = query.items.head,
+      entityId = ip,
       eventNames = Some(List("$set"))
       )
 
