@@ -142,6 +142,8 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
 
     var pr = propertyReader(query)
     logger.info(s"propertyReader:: ${pr}") 
+    while (pr.hasNext) 
+    println(pr.next())
 
     // propertyReader()
     // default itemScores array if items are not ranked at all
@@ -213,7 +215,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     d
   }
 
-  def propertyReader(/*sc: SparkContext,*/ query: Query) : RDD[String] = {
+  def propertyReader(/*sc: SparkContext,*/ query: Query) : Iterator[Event] = {
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
@@ -222,7 +224,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       appName=appName,
       entityType="item",
       entityId = query.items.head,
-     eventNames = Some(List("$set"))
+      eventNames = Some(List("$set"))
       )
 
     /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
