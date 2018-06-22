@@ -141,8 +141,10 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
 
     var pr = propertyReader(query)
     while (pr.hasNext) 
+    {
+    println(s"next")
     println(pr.next())
-
+    }
     /*logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
     var pr = query.items.foreach(propertyReader(_,query))
     logger.info(s"propertyReader:: ${pr}") 
@@ -223,6 +225,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
+
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
     val iprop = LEventStore.findByEntity(
       appName=appName,
@@ -233,11 +236,14 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val uprop = LEventStore.findByEntity(
       appName=appName,
       entityType="user",
-      entityId = query.users ,
+      entityId = query.user ,
       eventNames = Some(List("$set"))
       )
+/*
+    for (a <- 1 to query.items.length) {
+    }
 
-    /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
+    val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
       appName = ap.appName,
       entityType = "item"
       )(sc).map { case (entityId, properties) =>
