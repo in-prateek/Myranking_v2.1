@@ -141,7 +141,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
 
     var pr = propertyReader(query)
     while (pr.hasNext) 
-    println(pr.next()
+    println(pr.next())
 
     /*logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
     var pr = query.items.foreach(propertyReader(_,query))
@@ -224,10 +224,16 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     var d: Double = 0
     val appName = ap.appName
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
-    val prop = LEventStore.findByEntity(
+    val iprop = LEventStore.findByEntity(
       appName=appName,
       entityType="item",
       entityId = query.items.head ,
+      eventNames = Some(List("$set"))
+      )
+    val uprop = LEventStore.findByEntity(
+      appName=appName,
+      entityType="user",
+      entityId = query.users ,
       eventNames = Some(List("$set"))
       )
 
@@ -251,7 +257,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       }
       (entityId, property)
     }.cache()*/ 
-    prop
+    uprop
   }
 
 }

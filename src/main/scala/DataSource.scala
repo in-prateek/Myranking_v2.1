@@ -30,7 +30,9 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val user = try {
         // placeholder for expanding user properties
-          User()
+          User(
+            genre = properties.getOrElse[String]("Genre",s"Unk"),
+            country = properties.getOrElse[String]("Country",s"Unk"))
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +
@@ -103,7 +105,7 @@ class DataSource(val dsp: DataSourceParams)
   }
 }
 
-case class User()
+case class User(genre: String, country: String)
 
 case class Item(genre: String, country: String, rating: String)
 
