@@ -14,6 +14,7 @@ import org.apache.predictionio.data.store.PEventStore
 import org.apache.spark.rdd.RDD
 import org.apache.predictionio.data.storage.Event
 import org.apache.predictionio.controller.PDataSource
+import org.apache.predictionio.data.store.LEventStore
 
 import grizzled.slf4j.Logger
 
@@ -118,7 +119,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       blocks = -1,
       alpha = 1.0,
       seed = seed)
-logger.info(s"ALSalgorithm:113:::m.rank:::: ${m.rank}.")
+logger.info(s"AL5Salgorithm:113:::m.rank:::: ${m.rank}.")
 logger.info(s"ALSalgorithm:114:::m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
 logger.info(s"ALSalgorithm:115:::m.productFeatures.collectAsMap.toMap:::: ${m.productFeatures.collectAsMap.toMap}.")
 logger.info(s"ALSalgorithm:116:::userStringIntMap:::: ${userStringIntMap}.")
@@ -214,8 +215,9 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     var d: Double = 0
     val appName = ap.appName
     logger.info(s"appName::${appName}")
-    val prop = PEventStore.findByEntity(
-      appName=ap.appName,
+    //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
+    val prop = LEventStore.findByEntity(
+      appName=appName,
       entityType="item",
       entityId = query.items.get,
       event = "$set"
