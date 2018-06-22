@@ -221,8 +221,8 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val prop = LEventStore.findByEntity(
       appName=appName,
       entityType="item",
-      entityId = query.items.get,
-      eventNames = Some(Seq["$set"])
+      entityId = query.items.head,
+     eventNames = Some(List("$set"))
       )
 
     /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
