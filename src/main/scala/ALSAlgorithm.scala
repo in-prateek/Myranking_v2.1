@@ -239,7 +239,22 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       entityId = query.user ,
       eventNames = Some(List("$set"))
       )
-/*
+
+      while (iprop.hasNext)
+       {
+       println(s"FROM INTERNAL FUNCTION")
+       println(iprop.next())
+       ip=ip+iprop.next()
+       }
+
+       while (uprop.hasNext)
+       {
+       println(s"FROM INTERNAL FUNCTION")
+       println(uprop.next())
+       up=up+uprop.next()
+       }
+      println(s"up is ${up} and ip is ${ip}")
+/*    
     for (a <- 1 to query.items.length) {
     }
 
