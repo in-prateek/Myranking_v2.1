@@ -69,8 +69,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       " Please check if DataSource generates TrainingData" +
       " and Preprator generates PreparedData correctly.(this is item event error")
     // create User and item's String ID to integer index BiMap
-    var pr = propertyReader(query: Query)
-    logger.info(s"propertyReader:: ${pr}")
+   /* var pr = propertyReader(query: Query)
+    logger.info(s"propertyReader:: ${pr}")  */
 
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
@@ -140,6 +140,9 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val productFeatures = model.productFeatures
     logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
 
+    var pr = propertyReader(query)
+    logger.info(s"propertyReader:: ${pr}") 
+
     // propertyReader()
     // default itemScores array if items are not ranked at all
 
@@ -201,11 +204,11 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val size = v1.size
     var i = 0
     var d: Double = 0
-    logger.info(s"193:ALS::dotProduct::v1: Array[Double], v2: Array[Double] ${v1}. ${v2}")
+    //logger.info(s"193:ALS::dotProduct::v1: Array[Double], v2: Array[Double] ${v1}. ${v2}")
     while (i < size) {
       d += v1(i) * v2(i)
       i += 1
-    logger.info(s"200:ALS::d+  :  ${v1(i)} ** ${v2(i)}   ====   ${d}.")  
+    //logger.info(s"200:ALS::d+  :  ${v1(i)} ** ${v2(i)}   ====   ${d}.")  
     }
     d
   }
@@ -214,13 +217,12 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
-    logger.info(s"appName::${appName}")
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
     val prop = LEventStore.findByEntity(
       appName=appName,
       entityType="item",
       entityId = query.items.get,
-      eventNames = Some("$Set")
+      eventNames = Some(Seq["$set"])
       )
 
     /*val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
