@@ -138,12 +138,16 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
 
     val itemStringIntMap = model.itemStringIntMap
     val productFeatures = model.productFeatures
-    logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
 
+    var pr = propertyReader(query)
+    while (pr.hasNext) 
+    println(pr.next()
+
+    /*logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
     var pr = query.items.foreach(propertyReader(_,query))
     logger.info(s"propertyReader:: ${pr}") 
     while (pr.hasNext) 
-    println(pr.next())
+    println(pr.next())*/
 
     // propertyReader()
     // default itemScores array if items are not ranked at all
@@ -215,7 +219,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     d
   }
 
-  def propertyReader(ip: String ,query: Query) : Iterator[Event] = {
+  def propertyReader(query: Query) : Iterator[Event] = {
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
@@ -223,7 +227,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val prop = LEventStore.findByEntity(
       appName=appName,
       entityType="item",
-      entityId = ip,
+      entityId = query.items.head ,
       eventNames = Some(List("$set"))
       )
 
