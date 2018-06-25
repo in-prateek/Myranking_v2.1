@@ -142,18 +142,6 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val productFeatures = model.productFeatures
 
     var pr = propertyReader(query)
-    while (pr.hasNext) 
-    {
-    println(s"next")
-    println(pr.next())
-    }
-    /*logger.info(s"118::ALS: QUERY>ITEMS>> ${query.items}.")  
-    var pr = query.items.foreach(propertyReader(_,query))
-    logger.info(s"propertyReader:: ${pr}") 
-    while (pr.hasNext) 
-    println(pr.next())*/
-
-    // propertyReader()
     // default itemScores array if items are not ranked at all
 
     lazy val notRankedItemScores = query.items.map(i => ItemScore(i,0)).toArray
@@ -223,11 +211,12 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     d
   }
 
-  def propertyReader(query: Query) : Iterator[Event] = {
+  def propertyReader(query: Query) : collection.mutable.Map[String, Double] = {
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
     var iprop :  Iterator[Event] = null
+    var map = collection.mutable.Map[String, Double]()
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
    
     val uprop = LEventStore.findByEntity(
@@ -237,6 +226,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       eventNames = Some(List("$set"))
       )
     
+    for (uevent <- uprop){
     for(q <- query.items){ 
       logger.info(s"q at start of for loop is ${q}")
       iprop = LEventStore.findByEntity(
@@ -245,31 +235,45 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       entityId = q,
       eventNames = Some(List("$set"))
       )
-      //logger.info(s"iprop check ${iprop.toArray}.")
-      for (uevent <- uprop){
             for (ievent <- iprop){
               println(s"Checking for ITEM :${q} and USER:${query.user} ")
-              if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
-              {
-                println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
+              if (ievent.properties.fields.exists(_._1 == "Genre"))
+                {  
+                    if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
+                    {
+                      println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
+                      map += (q -> 1.1)
+                    }
+                    else{
+                      println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
+                    }
+                }
+              else{
+                  println(s"Property GENRE does not exists in item ${q}")
+              }
+              if (ievent.properties.fields.exists(_._1 == "Country")){
+                if(ievent.properties.fields("Country")==uevent.properties.fields("country"))
+                {
+                  println(s"for item ${q} and user ${query.user} Country EQUAL FOUND")
+                  if (map.exists(_._1 == q))
+                  map += (q -> 1.3)
+                  else 
+                  map += (q-> 1.2)
+                }
+                else{
+                  println(s"for item ${q} and user ${query.user} Country NOT EQUAL FOUND")
+                }
               }
               else{
-                println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
+                println(s"Property COUNTRY does not exists in item ${q}")
               }
-            
-
-              if(ievent.properties.fields("Country")==uevent.properties.fields("country"))
-              {
-                println(s"for item ${q} and user ${query.user} Country EQUAL FOUND")
-              }
-              else{
-                println(s"for item ${q} and user ${query.user} Country NOT EQUAL FOUND")
-              }
-            } 
+            }
+            printf(s"map to be returned is : ${map}")
+             
       }
 
     }
-  uprop
+  map
   }
 
 }
