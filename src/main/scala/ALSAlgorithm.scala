@@ -225,7 +225,8 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
-
+    var ip : String = s"ip"
+    var up : String =s" up"
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
     val iprop = LEventStore.findByEntity(
       appName=appName,
@@ -239,56 +240,11 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       entityId = query.user ,
       eventNames = Some(List("$set"))
       )
-
-      while (iprop.hasNext)
-       {
-       println(s"FROM INTERNAL FUNCTION")
-       println(iprop.next())
-       ip=ip+iprop.next()
-       }
-
-       while (uprop.hasNext)
-       {
-       println(s"FROM INTERNAL FUNCTION")
-       println(uprop.next())
-       up=up+uprop.next()
-       }
-      println(s"up is ${up} and ip is ${ip}")
-/*    
-    for (a <- 1 to query.items.length) {
-    }
-
-    val ItemProperty: RDD[(String,Property)] = PEventStore.aggregateProperties(
-      appName = ap.appName,
-      entityType = "item"
-      )(sc).map { case (entityId, properties) =>
-      val property = try {
-        logger.info(s"ALS:PROPERTY_READER_::genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
-        Property(
-          genre = properties.getOrElse[String]("Genre",s"Unk"),
-          country = properties.getOrElse[String]("Country",s"Unk"),
-          rating = properties.getOrElse[String]("Rating",s"0")
-        )
-      }catch {
-        case e: Exception => {
-          logger.error(s"PROPERTY_READER_::_Failed to get properties ${properties} of" +
-            s" item ${entityId}. Exception: ${e}.")
-          throw e
-        }
-      }
-      (entityId, property)
-    }.cache()*/ 
+    
+      ip= iprop.head
+      up= uprop.head
+      println(s"up is ${up} and ip is ${ip}") 
     uprop
   }
 
 }
-
-
-
-/*
-   val bias : RDD[(String,Property)]= ItemProperty
-    .map{b=>
-      val pid: string = b.
-    }.filter {case (pid,Property(A,B,C) )=>
-      (A=="i1")
-    */
