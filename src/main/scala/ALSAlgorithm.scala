@@ -227,8 +227,13 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
-    var ip : String = s"ip"
-    var up : String =s" up"
+
+    var igenre :String = s"Unknown"
+    var icountry :String = s"Unknown"
+
+    var ugenre :String = s"Unknown"
+    var ucountry :String= s"Unknown"
+
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
     val iprop = LEventStore.findByEntity(
       appName=appName,
@@ -242,16 +247,26 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       entityId = query.user ,
       eventNames = Some(List("$set"))
       )
-    
+      for (event <- uprop){
+        ugenre = event.properties.fields(genre)
+        ucountry = event.properties.fields(country)
+        println(s"Under the loop :247:: ${ugenre}::Under the loop :247:: ${ucountry}")
+      }
       for (event <- iprop){
-        println(s"Under the loop :247:: ${event}")
+        igenre = event.properties.fields(genre)
+        icountry = event.properties.fields(country)
+        println(s"Under the loop :247:: ${igenre}::Under the loop :247:: ${icountry}")
+        
+        if(igenre == ugenre)
+        {
+          println(s"GENRE MATCHES")
+        }
+
+        if(icountry == ucountry)
+        {
+          println(s"COUNTRY MATCHES")
+        }
       } 
-
-
-
-      //ip= iprop.head
-      //up= uprop.event
-      println(s"up is ${up} and ip is ${ip}") 
     uprop
   }
 
