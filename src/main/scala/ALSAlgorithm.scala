@@ -248,13 +248,13 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       eventNames = Some(List("$set"))
       )
       for (event <- uprop){
-        ugenre = event.properties.fields(genre)
-        ucountry = event.properties.fields(country)
+        ugenre = event.properties.fields("Genre")
+        ucountry = event.properties.fields("Country")
         println(s"Under the loop :247:: ${ugenre}::Under the loop :247:: ${ucountry}")
       }
       for (event <- iprop){
-        igenre = event.properties.fields(genre)
-        icountry = event.properties.fields(country)
+        igenre = event.properties.fields("Genre")
+        icountry = event.properties.fields("Country")
         println(s"Under the loop :247:: ${igenre}::Under the loop :247:: ${icountry}")
         
         if(igenre == ugenre)
