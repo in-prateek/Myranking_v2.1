@@ -228,11 +228,11 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     var d: Double = 0
     val appName = ap.appName
 
-    var igenre :String = s"Unknown"
-    var icountry :String = s"Unknown"
+    var igenre :JValue = JString(Unknown)
+    var icountry :JValue = JString(Unknown)
 
-    var ugenre :String = s"Unknown"
-    var ucountry :String= s"Unknown"
+    var ugenre :JValue = JString(Unknown)
+    var ucountry :JValue= JString(Unknown)
 
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
     val iprop = LEventStore.findByEntity(
