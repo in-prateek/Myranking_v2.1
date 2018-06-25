@@ -15,6 +15,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.predictionio.data.storage.Event
 import org.apache.predictionio.controller.PDataSource
 import org.apache.predictionio.data.store.LEventStore
+//pattern matching import:-
+import scala.util.matching.Regex
 
 import grizzled.slf4j.Logger
 
@@ -241,8 +243,14 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
       eventNames = Some(List("$set"))
       )
     
-      ip= iprop.head
-      up= uprop.head
+      for (event <- iprop){
+        println(s"Under the loop :247:: ${event}")
+      } 
+
+
+
+      //ip= iprop.head
+      //up= uprop.event
       println(s"up is ${up} and ip is ${ip}") 
     uprop
   }
