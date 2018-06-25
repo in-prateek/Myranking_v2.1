@@ -227,33 +227,49 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
-
+    var iprop :  Iterator[Event] = null
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
-    val iprop = LEventStore.findByEntity(
-      appName=appName,
-      entityType="item",
-      entityId = query.items.head ,
-      eventNames = Some(List("$set"))
-      )
+   
     val uprop = LEventStore.findByEntity(
       appName=appName,
       entityType="user",
       entityId = query.user ,
       eventNames = Some(List("$set"))
       )
+    
+    for(q <- query.items){ 
+      logger.info(s"q at start of for loop is ${q}")
+      iprop = LEventStore.findByEntity(
+      appName=appName,
+      entityType="item",
+      entityId = q,
+      eventNames = Some(List("$set"))
+      )
+      //logger.info(s"iprop check ${iprop.toArray}.")
       for (uevent <- uprop){
             for (ievent <- iprop){
-            if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
-            {
-              println(s"EQUAL Genre")
-            }
-            if(ievent.properties.fields("Country")==uevent.properties.fields("country"))
-            {
-              println(s"EQUAL Country")
-            }
-            } }
+              println(s"Checking for ITEM :${q} and USER:${query.user} ")
+              if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
+              {
+                println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
+              }
+              else{
+                println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
+              }
+            
 
-    uprop
+              if(ievent.properties.fields("Country")==uevent.properties.fields("country"))
+              {
+                println(s"for item ${q} and user ${query.user} Country EQUAL FOUND")
+              }
+              else{
+                println(s"for item ${q} and user ${query.user} Country NOT EQUAL FOUND")
+              }
+            } 
+      }
+
+    }
+  uprop
   }
 
 }
