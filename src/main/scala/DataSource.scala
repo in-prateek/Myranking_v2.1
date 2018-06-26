@@ -12,8 +12,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
-// addtion here:
-case class DataSourceParams(appName: String/*, eventNames : List[String]*/) extends Params
+case class DataSourceParams(appName: String) extends Params
 
 class DataSource(val dsp: DataSourceParams)
   extends PDataSource[TrainingData,
@@ -31,7 +30,9 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val user = try {
         // placeholder for expanding user properties
-        User()
+          User(
+            genre = properties.getOrElse[String]("Genre",s"Unk"),
+            country = properties.getOrElse[String]("Country",s"Unk"))
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +
@@ -49,7 +50,10 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val item = try {
         // placeholder for expanding item properties
-        Item()
+      logger.info(s"genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
+          Item(genre = properties.getOrElse[String]("Genre",s"Unk"),
+          country = properties.getOrElse[String]("Country",s"Unk"),
+          rating = properties.getOrElse[String]("Rating",s"0"))
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +
@@ -101,9 +105,9 @@ class DataSource(val dsp: DataSourceParams)
   }
 }
 
-case class User()
+case class User(genre: String, country: String)
 
-case class Item()
+case class Item(genre: String, country: String, rating: String)
 
 case class ViewEvent(user: String, item: String, t: Long, v: Int) // can we add a new arg here showing actionType
 

@@ -9,6 +9,13 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.mllib.recommendation.ALS
 import org.apache.spark.mllib.recommendation.{Rating => MLlibRating}
 
+//additional imports:- 
+import org.apache.predictionio.data.store.PEventStore
+import org.apache.spark.rdd.RDD
+import org.apache.predictionio.data.storage.Event
+import org.apache.predictionio.controller.PDataSource
+import org.apache.predictionio.data.store.LEventStore
+
 import grizzled.slf4j.Logger
 
 import scala.collection.parallel.immutable.ParVector
@@ -17,7 +24,8 @@ case class ALSAlgorithmParams(
   rank: Int,
   numIterations: Int,
   lambda: Double,
-  seed: Option[Long]) extends Params
+  seed: Option[Long],
+  appName :String) extends Params
 
 class ALSModel(
   val rank: Int,
@@ -61,10 +69,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       " Please check if DataSource generates TrainingData" +
       " and Preprator generates PreparedData correctly.(this is item event error")
     // create User and item's String ID to integer index BiMap
+   /* var pr = propertyReader(query: Query)
+    logger.info(s"propertyReader:: ${pr}")  */
+
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
-   // logger.info(s"data.items.keys valuemm ${data.items.keys}")
-  //  logger.info(s"data.users.keys valuemm ${data.users.keys}")
+
     val mllibRatings = data.viewEvents
       .map { r =>
       
@@ -116,17 +126,18 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       productFeatures = m.productFeatures.collectAsMap.toMap,
       userStringIntMap = userStringIntMap,
       itemStringIntMap = itemStringIntMap
-    )
+    ) 
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {
 
     val itemStringIntMap = model.itemStringIntMap
     val productFeatures = model.productFeatures
-
+    var scoreOpt_new : Double = 0 // new phase var
+    var pr = propertyReader(query)
     // default itemScores array if items are not ranked at all
-    lazy val notRankedItemScores =
-      query.items.map(i => ItemScore(i, 0)).toArray
+
+    lazy val notRankedItemScores = query.items.map(i => ItemScore(i,0)).toArray
 
     model.userStringIntMap.get(query.user).map { userIndex =>
       // lookup userFeature for the user
@@ -138,36 +149,57 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         .map { iid =>
           // convert query item id to index
           val featureOpt: Option[Array[Double]] = itemStringIntMap.get(iid)
-            // productFeatures may not contain the item
+          // productFeatures may not contain the item
             .map (index => productFeatures.get(index))
             // flatten Option[Option[Array[Double]]] to Option[Array[Double]]
             .flatten
-
           featureOpt.map(f => dotProduct(f, userFeature))
         }.seq // convert back to sequential collection
-
+        println(s"scores at 158 are :: ${scores}")
+        println(s"Item-Score -Int- Map is : ${itemStringIntMap}")
       // check if all scores is None (get rid of all None and see if empty)
       val isAllNone = scores.flatten.isEmpty
-
       if (isAllNone) {
         logger.info(s"No productFeature for all items ${query.items}.")
         PredictedResult(
           itemScores = notRankedItemScores,
-          isOriginal = true
+          isOriginal = true                       // while this is executed when data not found / not mapped properly:mm
         )
       } else {
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
-        val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
-            ItemScore(
+        logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
+        val sorted : Array[ItemScore]= query.items.zip(scores).map{ case (iid, scoreOpt) =>
+          if(pr.exists(_._1 == iid)){
+            println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
+            println(s"score from property reader to be added is : ${pr(iid)}")
+            println(s"scoreOpt.get gives :: ${scoreOpt.getOrElse[Double](0)}")
+            scoreOpt_new = (scoreOpt.getOrElse[Double](0)) + pr(iid)
+            pr -= iid
+            pr += (iid-> scoreOpt_new)
+            println(s"updated value of scoreOpt is ${scoreOpt_new}")
+            println(s"updated map is ${pr}")
+          }
+          else{
+            println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
+            println(s"item does not exits in new map so scores of old map will be included")
+            pr += (iid-> scoreOpt.getOrElse[Double](0)) 
+            println(s"updated value of scoreOpt is ${scoreOpt_new}")
+            println(s"updated map is ${pr}")
+          }
+              
+          ItemScore(
             item = iid,
-            score = scoreOpt.getOrElse[Double](0)
+            score = pr(iid)
+            //score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
 
+        println(s"Value of sorted is ${sorted.head}" )
+
         PredictedResult(
           itemScores = sorted,
-          isOriginal = false
+          isOriginal = false          // this is executed when data is found and mapped:mm
         )
       }
     }.getOrElse {
@@ -177,7 +209,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         isOriginal = true
       )
     }
-
   }
 
   private
@@ -187,9 +218,75 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     var d: Double = 0
     while (i < size) {
       d += v1(i) * v2(i)
-      i += 1
+      i += 1 
     }
     d
+  }
+
+  def propertyReader(query: Query) : collection.mutable.Map[String, Double] = {
+    //RDD if item-property
+    var d: Double = 0
+    val appName = ap.appName
+    var iprop :  Iterator[Event] = null
+    var map = collection.mutable.Map[String, Double]()
+    //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
+   
+    val uprop = LEventStore.findByEntity(
+      appName=appName,
+      entityType="user",
+      entityId = query.user ,
+      eventNames = Some(List("$set"))
+      )
+    
+    for (uevent <- uprop){
+    for(q <- query.items){ 
+      logger.info(s"q at start of for loop is ${q}")
+      iprop = LEventStore.findByEntity(
+      appName=appName,
+      entityType="item",
+      entityId = q,
+      eventNames = Some(List("$set"))
+      )
+            for (ievent <- iprop){
+              println(s"Checking for ITEM :${q} and USER:${query.user} ")
+              if (ievent.properties.fields.exists(_._1 == "Genre"))
+                {  
+                    if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
+                    {
+                      println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
+                      map += (q -> 0.2)
+                    }
+                    else{
+                      println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
+                      map += (q -> 0)
+                    }
+                }
+              else{
+                  println(s"Property GENRE does not exists in item ${q}")
+              }
+              if (ievent.properties.fields.exists(_._1 == "Country")){
+                if(ievent.properties.fields("Country")==uevent.properties.fields("country"))
+                {
+                  println(s"for item ${q} and user ${query.user} Country EQUAL FOUND")
+                  if (map.exists(_._1 == q))
+                  map += (q -> 0.3)
+                  else 
+                  map += (q-> 0.2)
+                }
+                else{
+                  println(s"for item ${q} and user ${query.user} Country NOT EQUAL FOUND")
+                }
+              }
+              else{
+                println(s"Property COUNTRY does not exists in item ${q}")
+              }
+            }
+            printf(s"map to be returned is : ${map}")
+             
+      }
+
+    }
+  map
   }
 
 }
