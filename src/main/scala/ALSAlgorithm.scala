@@ -133,7 +133,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     val itemStringIntMap = model.itemStringIntMap
     val productFeatures = model.productFeatures
-
+    var scoreOpt_new : Double = 0 // new phase var
     var pr = propertyReader(query)
     // default itemScores array if items are not ranked at all
 
@@ -169,18 +169,29 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
         logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
-        val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
+        val sorted : Array[ItemScore]= query.items.zip(scores).map{ case (iid, scoreOpt) =>
           if(pr.exists(_._1 == iid)){
             println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
             println(s"score from property reader to be added is : ${pr(iid)}")
             println(s"scoreOpt.get gives :: ${scoreOpt.getOrElse[Double](0)}")
             scoreOpt_new = (scoreOpt.getOrElse[Double](0)) + pr(iid)
+            pr -= iid
+            pr += (iid-> scoreOpt_new)
             println(s"updated value of scoreOpt is ${scoreOpt_new}")
+            println(s"updated map is ${pr}")
           }
-          println(s"val of sorted is : ${sorted}")
+          else{
+            println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
+            println(s"item does not exits in new map so scores of old map will be included")
+            pr += (iid-> scoreOpt.getOrElse[Double](0)) 
+            println(s"updated value of scoreOpt is ${scoreOpt_new}")
+            println(s"updated map is ${pr}")
+          }
+              
           ItemScore(
             item = iid,
-            score = scoreOpt.getOrElse[Double](0)
+            score = pr(iid)
+            //score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
 
@@ -247,6 +258,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                     }
                     else{
                       println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
+                      map += (q -> 0)
                     }
                 }
               else{
