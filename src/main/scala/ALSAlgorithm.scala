@@ -15,8 +15,6 @@ import org.apache.spark.rdd.RDD
 import org.apache.predictionio.data.storage.Event
 import org.apache.predictionio.controller.PDataSource
 import org.apache.predictionio.data.store.LEventStore
-//pattern matching import:-
-import scala.util.matching.Regex
 
 import grizzled.slf4j.Logger
 
@@ -121,12 +119,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       blocks = -1,
       alpha = 1.0,
       seed = seed)
-logger.info(s"ALSalgorithm:113:::m.rank:::: ${m.rank}.")
-logger.info(s"ALSalgorithm:114:::m.userFeatures.collectAsMap.toMap:::: ${m.userFeatures.collectAsMap.toMap}.")
-logger.info(s"ALSalgorithm:115:::m.productFeatures.collectAsMap.toMap:::: ${m.productFeatures.collectAsMap.toMap}.")
-logger.info(s"ALSalgorithm:116:::userStringIntMap:::: ${userStringIntMap}.")
-logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
-  
+
     new ALSModel(
       rank = m.rank,
       userFeatures = m.userFeatures.collectAsMap.toMap,
@@ -160,10 +153,10 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
             .map (index => productFeatures.get(index))
             // flatten Option[Option[Array[Double]]] to Option[Array[Double]]
             .flatten
-
           featureOpt.map(f => dotProduct(f, userFeature))
         }.seq // convert back to sequential collection
-
+        println(s"scores at 158 are :: ${scores}")
+        println(s"Item-Score -Int- Map is : ${itemStringIntMap}")
       // check if all scores is None (get rid of all None and see if empty)
       val isAllNone = scores.flatten.isEmpty
       if (isAllNone) {
@@ -177,11 +170,21 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
         logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
         val sorted = query.items.zip(scores).map{ case (iid, scoreOpt) =>
+          if(pr.exists(_._1 == iid)){
+            println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
+            println(s"score from property reader to be added is : ${pr(iid)}")
+            println(s"scoreOpt.get gives :: ${scoreOpt.getOrElse[Double](0)}")
+            scoreOpt_new = (scoreOpt.getOrElse[Double](0)) + pr(iid)
+            println(s"updated value of scoreOpt is ${scoreOpt_new}")
+          }
+          println(s"val of sorted is : ${sorted}")
           ItemScore(
             item = iid,
             score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
+
+        println(s"Value of sorted is ${sorted.head}" )
 
         PredictedResult(
           itemScores = sorted,
@@ -202,11 +205,9 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
     val size = v1.size
     var i = 0
     var d: Double = 0
-    //logger.info(s"193:ALS::dotProduct::v1: Array[Double], v2: Array[Double] ${v1}. ${v2}")
     while (i < size) {
       d += v1(i) * v2(i)
-      i += 1
-    //logger.info(s"200:ALS::d+  :  ${v1(i)} ** ${v2(i)}   ====   ${d}.")  
+      i += 1 
     }
     d
   }
@@ -242,7 +243,7 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
                     if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
                     {
                       println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
-                      map += (q -> 1.1)
+                      map += (q -> 0.2)
                     }
                     else{
                       println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
@@ -256,9 +257,9 @@ logger.info(s"ALSalgorithm:117:::itemStringIntMap:::: ${itemStringIntMap}.")
                 {
                   println(s"for item ${q} and user ${query.user} Country EQUAL FOUND")
                   if (map.exists(_._1 == q))
-                  map += (q -> 1.3)
+                  map += (q -> 0.3)
                   else 
-                  map += (q-> 1.2)
+                  map += (q-> 0.2)
                 }
                 else{
                   println(s"for item ${q} and user ${query.user} Country NOT EQUAL FOUND")
