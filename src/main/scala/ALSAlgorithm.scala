@@ -248,10 +248,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       eventNames = Some(List("$set"))
       )
             for (ievent <- iprop){
-              println(s"Checking for ITEM :${q} and USER:${query.user} ")
-              if (ievent.properties.fields.exists(_._1 == "Genre"))
+              for ( x <- ap.property )
+              {
+              println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
+              if (ievent.properties.fields.exists(_._1 == x))
                 {  
-                    if(ievent.properties.fields("Genre")==uevent.properties.fields("genre"))
+                    if(ievent.properties.fields(x)==uevent.properties.fields(x))
                     {
                       println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
                       map += (q -> 0.2)
@@ -262,24 +264,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                     }
                 }
               else{
-                  println(s"Property GENRE does not exists in item ${q}")
-              }
-              if (ievent.properties.fields.exists(_._1 == "Country")){
-                if(ievent.properties.fields("Country")==uevent.properties.fields("country"))
-                {
-                  println(s"for item ${q} and user ${query.user} Country EQUAL FOUND")
-                  if (map.exists(_._1 == q))
-                  map += (q -> 0.3)
-                  else 
-                  map += (q-> 0.2)
-                }
-                else{
-                  println(s"for item ${q} and user ${query.user} Country NOT EQUAL FOUND")
-                }
-              }
-              else{
-                println(s"Property COUNTRY does not exists in item ${q}")
-              }
+                  println(s"Property ${x} does not exists in item ${q}")
+              }}
             }
             printf(s"map to be returned is : ${map}")
              
