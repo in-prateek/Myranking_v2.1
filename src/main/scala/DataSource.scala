@@ -36,6 +36,7 @@ class DataSource(val dsp: DataSourceParams)
       entityType = "user"
     )(sc).map { case (entityId, properties) =>
       val user = try {
+        println(s"get properties ${properties}")
         // placeholder for expanding user properties
           User(dsp.property)
       } catch {
@@ -54,7 +55,6 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val item = try {
         // placeholder for expanding item properties
-      logger.info(s"genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
           Item(dsp.property)
       } catch {
         case e: Exception => {

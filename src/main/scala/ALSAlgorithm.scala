@@ -25,7 +25,9 @@ case class ALSAlgorithmParams(
   numIterations: Int,
   lambda: Double,
   seed: Option[Long],
-  appName :String) extends Params
+  appName :String,
+  property :Array[String]
+) extends Params
 
 class ALSModel(
   val rank: Int,
