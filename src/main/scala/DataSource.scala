@@ -12,7 +12,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
-case class DataSourceParams(appName: String) extends Params
+case class DataSourceParams(appName: String, prop1 : String) extends Params
 
 class DataSource(val dsp: DataSourceParams)
   extends PDataSource[TrainingData,
@@ -22,7 +22,7 @@ class DataSource(val dsp: DataSourceParams)
 
   override
   def readTraining(sc: SparkContext): TrainingData = {
-
+    println{s"Param added to json is : ${dsp.prop1}"}
     // create a RDD of (entityID, User)
     val usersRDD: RDD[(String, User)] = PEventStore.aggregateProperties(
       appName = dsp.appName,

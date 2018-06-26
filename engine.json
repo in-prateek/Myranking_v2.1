@@ -4,7 +4,8 @@
   "engineFactory": "org.template.productranking.ProductRankingEngine",
   "datasource": {
     "params" : {
-      "appName": "capp"
+      "appName": "capp",
+      "prop1" : "Country" 
     }
   },
   "algorithms": [
@@ -16,6 +17,7 @@
         "lambda": 0.01,
         "seed": 3,
         "appName":"capp"
+        
       }
     }
   ]
