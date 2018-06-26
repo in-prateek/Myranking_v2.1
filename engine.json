@@ -5,10 +5,10 @@
   "datasource": {
     "params" : {
       "appName": "capp",
-      "property" : {
-        "prop1":"Country",
-        "prop2":"Country"
-      } 
+      "property" : [
+        "Country",
+        "Genre"
+      ]
     }
   },
   "algorithms": [

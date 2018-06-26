@@ -22,7 +22,7 @@ class DataSource(val dsp: DataSourceParams)
 
   override
   def readTraining(sc: SparkContext): TrainingData = {
-    println{s"Param added to json is : ${dsp.iproperty.prop1}"}
+    println{s"Param added to json is : ${dsp.property[0]}"}
     // create a RDD of (entityID, User)
     val usersRDD: RDD[(String, User)] = PEventStore.aggregateProperties(
       appName = dsp.appName,
