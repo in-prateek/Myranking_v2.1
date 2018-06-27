@@ -81,13 +81,17 @@ class DataSource(val dsp: DataSourceParams)
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v=1)
+              v=2)
              case "play" => ViewEvent(
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v= 2)
-            case _ => throw new Exception(s"Unexpected event ${event} is read.")
+              v= 1)
+            case _ => ViewEvent(
+              user = event.entityId,
+              item = event.targetEntityId.get,
+              t = event.eventTime.getMillis,
+              v= 3)
           }
         } catch {
           case e: Exception => {
@@ -122,5 +126,6 @@ class TrainingData(
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
     s"items: [${items.count()} (${items.take(2).toList}...)]" +
     s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
+  
 }
 }
