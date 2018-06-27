@@ -9,9 +9,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.mllib.recommendation.ALS
 import org.apache.spark.mllib.recommendation.{Rating => MLlibRating}
 
-//additional imports:- 
 import org.apache.predictionio.data.store.PEventStore
-import org.apache.spark.rdd.RDD
 import org.apache.predictionio.data.storage.Event
 import org.apache.predictionio.controller.PDataSource
 import org.apache.predictionio.data.store.LEventStore
@@ -71,9 +69,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       " Please check if DataSource generates TrainingData" +
       " and Preprator generates PreparedData correctly.(this is item event error")
     // create User and item's String ID to integer index BiMap
-   /* var pr = propertyReader(query: Query)
-    logger.info(s"propertyReader:: ${pr}")  */
-
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
 
@@ -165,7 +160,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         logger.info(s"No productFeature for all items ${query.items}.")
         PredictedResult(
           itemScores = notRankedItemScores,
-          isOriginal = true                       // while this is executed when data not found / not mapped properly:mm
+          isOriginal = true
         )
       } else {
         // sort the score
@@ -193,6 +188,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           ItemScore(
             item = iid,
             score = pr(iid)
+            // replace score by following to obtain original score w/o bias
             //score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
@@ -201,7 +197,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
         PredictedResult(
           itemScores = sorted,
-          isOriginal = false          // this is executed when data is found and mapped:mm
+          isOriginal = false  
         )
       }
     }.getOrElse {
@@ -231,6 +227,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val appName = ap.appName
     var iprop :  Iterator[Event] = null
     var map = collection.mutable.Map[String, Double]()
+    var count : Double  = 0
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
    
     val uprop = LEventStore.findByEntity(
@@ -250,18 +247,21 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       eventNames = Some(List("$set"))
       )
             for (ievent <- iprop){
+              count = 0
               for ( x <- ap.property )
               {
-              println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
+             // println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
               if (ievent.properties.fields.exists(_._1 == x))
                 {  
                     if(ievent.properties.fields(x)==uevent.properties.fields(x))
                     {
-                      println(s"for item ${q} and user ${query.user} Genre EQUAL FOUND")
-                      map += (q -> 0.2)
+                      //println(s"for item ${q} :: user ${query.user} :: property:${x}  EQUAL FOUND")
+                      count += 1
+                      map += (q -> 0.2* count)
                     }
                     else{
-                      println(s"for item ${q} and user ${query.user} Genre NOT EQUAL FOUND")
+                     // println(s"for item ${q} :: user ${query.user} :: property:${x} NOT EQUAL FOUND")
+                      if (map.exists(_._1 == q)==0)
                       map += (q -> 0)
                     }
                 }
