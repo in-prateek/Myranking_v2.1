@@ -12,7 +12,11 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
-case class DataSourceParams(appName: String, property : Array[String]) extends Params
+case class DataSourceParams(
+  appName: String, 
+  property : Array[String],
+  events : Array[String],
+  scores : Array[Int]) extends Params
 
 class DataSource(val dsp: DataSourceParams)
   extends PDataSource[TrainingData,
@@ -70,7 +74,7 @@ class DataSource(val dsp: DataSourceParams)
     val viewEventsRDD: RDD[ViewEvent] = PEventStore.find(
       appName = dsp.appName,
       entityType = Some("user"),
-      eventNames = Some(List("view","play")),
+      eventNames = Some(dsp.events.toList),
       // targetEntityType is optional field of an event.
       targetEntityType = Some(Some("item")))(sc)
       // eventsDb.find() returns RDD[Event]
@@ -81,17 +85,17 @@ class DataSource(val dsp: DataSourceParams)
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v=2)
+              v=dsp.scores(dsp.events.toList.indexOf("view")))
              case "play" => ViewEvent(
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v= 1)
+              v=dsp.scores(dsp.events.toList.indexOf("play")))
             case _ => ViewEvent(
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v= 3)
+              v=dsp.scores(dsp.events.toList.indexOf(event.event)))
           }
         } catch {
           case e: Exception => {
@@ -100,6 +104,7 @@ class DataSource(val dsp: DataSourceParams)
             throw e
           }
         }
+        println(s"viewEvent is : ${viewEvent}")
         viewEvent
       }.cache()
 

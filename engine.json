@@ -8,6 +8,16 @@
       "property" : [
         "Country",
         "Genre"
+      ],
+      "events" : [
+        "view",
+        "play",
+        "like"
+      ],
+      "scores":[
+        "1",
+        "1",
+        "1"
       ]
     }
   },
