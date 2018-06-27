@@ -12,7 +12,11 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 import grizzled.slf4j.Logger
-case class DataSourceParams(appName: String) extends Params
+case class DataSourceParams(
+  appName: String, 
+  property : Array[String],
+  events : Array[String],
+  scores : Array[Int]) extends Params
 
 class DataSource(val dsp: DataSourceParams)
   extends PDataSource[TrainingData,
@@ -22,17 +26,23 @@ class DataSource(val dsp: DataSourceParams)
 
   override
   def readTraining(sc: SparkContext): TrainingData = {
-
+    
+    //testing phase new : 
+    println{s"Param added to json is : ${dsp.property}"}
+      // Print all the array elements
+      for ( x <- dsp.property ) {
+         println( x )
+      }
+    
     // create a RDD of (entityID, User)
     val usersRDD: RDD[(String, User)] = PEventStore.aggregateProperties(
       appName = dsp.appName,
       entityType = "user"
     )(sc).map { case (entityId, properties) =>
       val user = try {
+        println(s"get properties ${properties}")
         // placeholder for expanding user properties
-          User(
-            genre = properties.getOrElse[String]("Genre",s"Unk"),
-            country = properties.getOrElse[String]("Country",s"Unk"))
+          User(dsp.property)
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +
@@ -42,7 +52,6 @@ class DataSource(val dsp: DataSourceParams)
       }
       (entityId, user)
     }.cache()
-
     // create a RDD of (entityID, Item)
     val itemsRDD: RDD[(String, Item)] = PEventStore.aggregateProperties(
       appName = dsp.appName,
@@ -50,10 +59,7 @@ class DataSource(val dsp: DataSourceParams)
     )(sc).map { case (entityId, properties) =>
       val item = try {
         // placeholder for expanding item properties
-      logger.info(s"genre::${ properties.getOrElse[String]("Genre",s"Unk")} and country :: ${properties.getOrElse[String]("Country",s"Unk")}")
-          Item(genre = properties.getOrElse[String]("Genre",s"Unk"),
-          country = properties.getOrElse[String]("Country",s"Unk"),
-          rating = properties.getOrElse[String]("Rating",s"0"))
+          Item(dsp.property)
       } catch {
         case e: Exception => {
           logger.error(s"Failed to get properties ${properties} of" +
@@ -68,7 +74,7 @@ class DataSource(val dsp: DataSourceParams)
     val viewEventsRDD: RDD[ViewEvent] = PEventStore.find(
       appName = dsp.appName,
       entityType = Some("user"),
-      eventNames = Some(List("view","play")),
+      eventNames = Some(dsp.events.toList),
       // targetEntityType is optional field of an event.
       targetEntityType = Some(Some("item")))(sc)
       // eventsDb.find() returns RDD[Event]
@@ -79,13 +85,17 @@ class DataSource(val dsp: DataSourceParams)
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v=1)
+              v=dsp.scores(dsp.events.toList.indexOf("view")))
              case "play" => ViewEvent(
               user = event.entityId,
               item = event.targetEntityId.get,
               t = event.eventTime.getMillis,
-              v= 2)
-            case _ => throw new Exception(s"Unexpected event ${event} is read.")
+              v=dsp.scores(dsp.events.toList.indexOf("play")))
+            case _ => ViewEvent(
+              user = event.entityId,
+              item = event.targetEntityId.get,
+              t = event.eventTime.getMillis,
+              v=dsp.scores(dsp.events.toList.indexOf(event.event)))
           }
         } catch {
           case e: Exception => {
@@ -94,6 +104,7 @@ class DataSource(val dsp: DataSourceParams)
             throw e
           }
         }
+        println(s"viewEvent is : ${viewEvent}")
         viewEvent
       }.cache()
 
@@ -105,9 +116,9 @@ class DataSource(val dsp: DataSourceParams)
   }
 }
 
-case class User(genre: String, country: String)
+case class User(duprop:Array[String])
 
-case class Item(genre: String, country: String, rating: String)
+case class Item(diprop:Array[String])
 
 case class ViewEvent(user: String, item: String, t: Long, v: Int) // can we add a new arg here showing actionType
 
