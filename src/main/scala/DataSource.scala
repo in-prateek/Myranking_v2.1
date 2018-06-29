@@ -26,14 +26,6 @@ class DataSource(val dsp: DataSourceParams)
 
   override
   def readTraining(sc: SparkContext): TrainingData = {
-    
-    //testing phase new : 
-    println{s"Param added to json is : ${dsp.property}"}
-      // Print all the array elements
-      for ( x <- dsp.property ) {
-         println( x )
-      }
-    
     // create a RDD of (entityID, User)
     val usersRDD: RDD[(String, User)] = PEventStore.aggregateProperties(
       appName = dsp.appName,
@@ -104,7 +96,6 @@ class DataSource(val dsp: DataSourceParams)
             throw e
           }
         }
-        println(s"viewEvent is : ${viewEvent}")
         viewEvent
       }.cache()
 
@@ -120,7 +111,7 @@ case class User(duprop:Array[String])
 
 case class Item(diprop:Array[String])
 
-case class ViewEvent(user: String, item: String, t: Long, v: Int) // can we add a new arg here showing actionType
+case class ViewEvent(user: String, item: String, t: Long, v: Int) 
 
 class TrainingData(
   val users: RDD[(String, User)],
@@ -131,6 +122,5 @@ class TrainingData(
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
     s"items: [${items.count()} (${items.take(2).toList}...)]" +
     s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
-  
 }
 }

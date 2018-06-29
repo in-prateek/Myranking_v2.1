@@ -78,7 +78,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       
         // Convert user and item String IDs to Int index for MLlib
         val a = r.v
-        logger.info(s"r.viewEvent valuemm ${r.v} for ${r.user}:: ${r.item} ::  ${r.t} ")
         val uindex = userStringIntMap.getOrElse(r.user, -1)
         val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
@@ -153,8 +152,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             .flatten
           featureOpt.map(f => dotProduct(f, userFeature))
         }.seq // convert back to sequential collection
-        println(s"scores at 158 are :: ${scores}")
-        println(s"Item-Score -Int- Map is : ${itemStringIntMap}")
       // check if all scores is None (get rid of all None and see if empty)
       val isAllNone = scores.flatten.isEmpty
       if (isAllNone) {
@@ -169,21 +166,21 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
         val sorted : Array[ItemScore]= query.items.zip(scores).map{ case (iid, scoreOpt) =>
           if(pr.exists(_._1 == iid)){
-            println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
-            println(s"score from property reader to be added is : ${pr(iid)}")
-            println(s"scoreOpt.get gives :: ${scoreOpt.getOrElse[Double](0)}")
+            //println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
+           // println(s"score from property reader to be added is : ${pr(iid)}")
+            //println(s"scoreOpt.get gives :: ${scoreOpt.getOrElse[Double](0)}")
             scoreOpt_new = (scoreOpt.getOrElse[Double](0)) + pr(iid)
             pr -= iid
             pr += (iid-> scoreOpt_new)
-            println(s"updated value of scoreOpt is ${scoreOpt_new}")
+           // println(s"updated value of scoreOpt is ${scoreOpt_new}")
             println(s"updated map is ${pr}")
           }
           else{
-            println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
-            println(s"item does not exits in new map so scores of old map will be included")
+           //println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
+           //println(s"item does not exits in new map so scores of old map will be included")
             pr += (iid-> scoreOpt.getOrElse[Double](0)) 
-            println(s"updated value of scoreOpt is ${scoreOpt_new}")
-            println(s"updated map is ${pr}")
+            //println(s"updated value of scoreOpt is ${scoreOpt_new}")
+            //println(s"updated map is ${pr}")
           }
               
           ItemScore(
@@ -274,7 +271,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
               println(s"Property ${x} does not exists in item ${q}")
           }}
         }
-        printf(s"map to be returned is : ${map}")
+       // printf(s"map to be returned is : ${map}")
              
       }
 
