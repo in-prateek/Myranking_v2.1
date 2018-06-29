@@ -32,7 +32,7 @@ class DataSource(val dsp: DataSourceParams)
       entityType = "user"
     )(sc).map { case (entityId, properties) =>
       val user = try {
-        println(s"get properties ${properties}")
+        // println(s"get properties ${properties}")
         // placeholder for expanding user properties
           User(dsp.property)
       } catch {
