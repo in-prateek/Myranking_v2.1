@@ -172,14 +172,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             scoreOpt_new = (scoreOpt.getOrElse[Double](0)) + pr(iid)
             pr -= iid
             pr += (iid-> scoreOpt_new)
-           // println(s"updated value of scoreOpt is ${scoreOpt_new}")
-            println(s"updated map is ${pr}")
+           // println(s"updated map is ${pr}")
           }
           else{
            //println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
            //println(s"item does not exits in new map so scores of old map will be included")
             pr += (iid-> scoreOpt.getOrElse[Double](0)) 
-            //println(s"updated value of scoreOpt is ${scoreOpt_new}")
             //println(s"updated map is ${pr}")
           }
               
@@ -228,7 +226,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     var map = collection.mutable.Map[String, Double]()
     var count : Double  = 0
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
-    println(s"Val of bias is : ${bias(0)}")
     val uprop = LEventStore.findByEntity(
       appName=appName,
       entityType="user",
@@ -238,7 +235,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     
     for (uevent <- uprop){
     for(q <- query.items){ 
-      logger.info(s"q at start of for loop is ${q}")
       iprop = LEventStore.findByEntity(
       appName=appName,
       entityType="item",
@@ -272,9 +268,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           }}
         }
        // printf(s"map to be returned is : ${map}")
-             
       }
-
     }
   map
   }
