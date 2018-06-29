@@ -24,7 +24,8 @@ case class ALSAlgorithmParams(
   lambda: Double,
   seed: Option[Long],
   appName :String,
-  property :Array[String]
+  property :Array[String],
+  bias : Array[Int]
 ) extends Params
 
 class ALSModel(
@@ -224,14 +225,15 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   def propertyReader(query: Query) : collection.mutable.Map[String, Double] = {
     //RDD if item-property
     var d: Double = 0
-    val appName = ap.appName
+    val appName_pr = ap.appName
+    val bias_pr = ap.bias.toList
     var iprop :  Iterator[Event] = null
     var map = collection.mutable.Map[String, Double]()
     var count : Double  = 0
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
    
     val uprop = LEventStore.findByEntity(
-      appName=appName,
+      appName=appName_pr,
       entityType="user",
       entityId = query.user ,
       eventNames = Some(List("$set"))
@@ -241,40 +243,35 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     for(q <- query.items){ 
       logger.info(s"q at start of for loop is ${q}")
       iprop = LEventStore.findByEntity(
-      appName=appName,
+      appName=appName_pr,
       entityType="item",
       entityId = q,
       eventNames = Some(List("$set"))
       )
-            for (ievent <- iprop){
-              count = 0
-              for ( x <- ap.property )
-              {
-             // println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
-              if (ievent.properties.fields.exists(_._1 == x))
-                {  
-                    if(ievent.properties.fields(x)==uevent.properties.fields(x))
-                    {
-                      //println(s"for item ${q} :: user ${query.user} :: property:${x}  EQUAL FOUND")
-                      count += 1
-                      map += (q -> 0.2* count)
-                    }
-                    else{
-                     // println(s"for item ${q} :: user ${query.user} :: property:${x} NOT EQUAL FOUND")
-                      if (map.exists(_._1 == q)==0)
-                      map += (q -> 0)
-                    }
-                }
+        for (ievent <- iprop){
+          count = 0
+          for ( x <- ap.property ){
+            // println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
+            if (ievent.properties.fields.exists(_._1 == x)){  
+              if(ievent.properties.fields(x)==uevent.properties.fields(x)){
+                //println(s"for item ${q} :: user ${query.user} :: property:${x}  EQUAL FOUND")
+                d = bias_pr.head
+                map += (q -> d)
+              }
               else{
-                  println(s"Property ${x} does not exists in item ${q}")
-              }}
+                // println(s"for item ${q} :: user ${query.user} :: property:${x} NOT EQUAL FOUND")
+                if (map.exists(_._1 == q)==0)
+                map += (q -> 0)
+              }
             }
-            printf(s"map to be returned is : ${map}")
-             
-      }
-
+            else{
+              println(s"Property ${x} does not exists in item ${q}")
+            }
+          }
+        }
+      printf(s"map to be returned is : ${map}")   
+    }
     }
   map
   }
-
 }
