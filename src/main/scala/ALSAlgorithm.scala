@@ -163,7 +163,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       } else {
         // sort the score
         val ord = Ordering.by[ItemScore, Double](_.score).reverse
-        logger.info(s"167:ALS::query.items.zip(scores) ${ query.items.zip(scores)}.")
         val sorted : Array[ItemScore]= query.items.zip(scores).map{ case (iid, scoreOpt) =>
           if(pr.exists(_._1 == iid)){
             //println(s"Code is running for iid : ${iid} and score is ${scoreOpt}")
@@ -188,8 +187,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             //score = scoreOpt.getOrElse[Double](0)
           )
         }.sorted(ord).toArray
-
-        println(s"Value of sorted is ${sorted.head}" )
 
         PredictedResult(
           itemScores = sorted,
@@ -267,7 +264,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
               println(s"Property ${x} does not exists in item ${q}")
           }}
         }
-       // printf(s"map to be returned is : ${map}")
+       // println(s"map to be returned is : ${map}")
       }
     }
   map
