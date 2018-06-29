@@ -24,7 +24,8 @@ case class ALSAlgorithmParams(
   lambda: Double,
   seed: Option[Long],
   appName :String,
-  property :Array[String]
+  property :Array[String],
+  bias1 : Array[Double]
 ) extends Params
 
 class ALSModel(
@@ -225,11 +226,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     //RDD if item-property
     var d: Double = 0
     val appName = ap.appName
+    val bias = ap.bias1
     var iprop :  Iterator[Event] = null
     var map = collection.mutable.Map[String, Double]()
     var count : Double  = 0
     //https://github.com/actionml/universal-recommender/blob/c6d8175eaead615598f751e878e91daad4b66150/src/main/scala/URAlgorithm.scala#L798
-   
+    println(s"Val of bias is : ${bias(0)}")
     val uprop = LEventStore.findByEntity(
       appName=appName,
       entityType="user",
@@ -246,30 +248,33 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       entityId = q,
       eventNames = Some(List("$set"))
       )
-            for (ievent <- iprop){
-              count = 0
-              for ( x <- ap.property )
-              {
-             // println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
-              if (ievent.properties.fields.exists(_._1 == x))
-                {  
-                    if(ievent.properties.fields(x)==uevent.properties.fields(x))
-                    {
-                      //println(s"for item ${q} :: user ${query.user} :: property:${x}  EQUAL FOUND")
-                      count += 1
-                      map += (q -> 0.2* count)
-                    }
-                    else{
-                     // println(s"for item ${q} :: user ${query.user} :: property:${x} NOT EQUAL FOUND")
-                      if (map.exists(_._1 == q)==0)
-                      map += (q -> 0)
-                    }
+        for (ievent <- iprop){
+          d = 0
+          for ( x <- ap.property )
+          {
+         // println(s"Checking for ITEM :${q} :: USER:${query.user} :: property:${x}")
+          if (ievent.properties.fields.exists(_._1 == x))
+            {  
+                if(ievent.properties.fields(x)==uevent.properties.fields(x))
+                {
+                  //println(s"for item ${q} :: user ${query.user} :: property:${x}  EQUAL FOUND")
+                  if (map.exists(_._1 == q))
+                  d = map(q)
+
+                  d +=  bias(ap.property.indexOf(x))
+                  map += (q -> d)
                 }
-              else{
-                  println(s"Property ${x} does not exists in item ${q}")
-              }}
+                else{
+                 // println(s"for item ${q} :: user ${query.user} :: property:${x} NOT EQUAL FOUND")
+                  if (map.exists(_._1 == q)==0)
+                  map += (q -> 0)
+                }
             }
-            printf(s"map to be returned is : ${map}")
+          else{
+              println(s"Property ${x} does not exists in item ${q}")
+          }}
+        }
+        printf(s"map to be returned is : ${map}")
              
       }
 

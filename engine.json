@@ -33,8 +33,11 @@
         "property" : [
         "Country",
         "Genre"
-      ]
-        
+      ], 
+        "bias1" :[
+          0.2,
+          0.2
+        ]
       }
     }
   ]
